@@ -1,4 +1,5 @@
 import { useNavigate } from "react-router-dom";
+import { POSTS_URL } from "../api";
 
 function Post({ post }) {
   const navigate = useNavigate();
@@ -8,10 +9,14 @@ function Post({ post }) {
   };
 
   const handleDelete = async () => {
-    await fetch(`http://localhost:3000/api/v1/posts/${post._id}`, {
-      method: "DELETE",
-    });
-    window.location.reload();
+    try {
+      await fetch(`${POSTS_URL}/${post._id}`, {
+        method: "DELETE",
+      });
+      window.location.reload();
+    } catch (err) {
+      console.error("Failed to delete post:", err);
+    }
   };
 
   return (

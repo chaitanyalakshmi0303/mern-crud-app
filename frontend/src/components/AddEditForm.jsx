@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import { useNavigate, useParams } from "react-router-dom";
+import { POSTS_URL } from "../api";
 
 function AddEditForm() {
   const { id } = useParams();
@@ -10,10 +11,16 @@ function AddEditForm() {
   useEffect(() => {
     if (id) {
       async function fetchPost() {
-        const response = await fetch(`http://localhost:3000/api/v1/posts/${id}`);
-        const data = await response.json();
-        setTitle(data.data.title);
-        setContent(data.data.content);
+        try {
+          const response = await fetch(`${POSTS_URL}/${id}`);
+          const data = await response.json();
+          if (data.data) {
+            setTitle(data.data.title || "");
+            setContent(data.data.content || "");
+          }
+        } catch (err) {
+          console.error("Failed to fetch post:", err);
+        }
       }
       fetchPost();
     }
@@ -22,9 +29,7 @@ function AddEditForm() {
   const handleSubmit = async (e) => {
     e.preventDefault();
     const method = id ? "PUT" : "POST";
-    const url = id
-      ? `http://localhost:3000/api/v1/posts/${id}`
-      : "http://localhost:3000/api/v1/posts";
+    const url = id ? `${POSTS_URL}/${id}` : POSTS_URL;
     await fetch(url, {
       method,
       headers: {
